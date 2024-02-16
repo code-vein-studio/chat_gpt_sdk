@@ -105,10 +105,7 @@ class OpenAIClient extends OpenAIWrapper {
           onDone: () {
             final rawData = utf8.decode(chunks);
 
-            final dataList = rawData
-                .split("\n")
-                .where((element) => element.isNotEmpty)
-                .toList();
+            final dataList = rawData.split("\n").where((element) => element.isNotEmpty).toList();
 
             for (final line in dataList) {
               if (line.startsWith("data: ")) {
@@ -333,21 +330,23 @@ class OpenAIClient extends OpenAIWrapper {
           it.data.stream.listen(
             (it) {
               final rawData = utf8.decode(it);
-              final dataList = rawData
-                  .split("\n")
-                  .where((element) => element.isNotEmpty)
-                  .toList();
+              final dataList = rawData.split("\n").where((element) => element.isNotEmpty).toList();
 
               for (final line in dataList) {
+                print("line: " + line);
                 if (line.startsWith("data: ")) {
+                  print("data: " + line);
                   final data = line.substring(6);
+                  print("data2: " + line);
                   if (data.startsWith("[DONE]")) {
+                    print("stream response is done");
                     log.log("stream response is done");
 
                     return;
                   }
 
                   try {
+                    print("TRY: " + data);
                     controller
                       ..sink
                       ..add(complete(json.decode(data)));
@@ -358,6 +357,7 @@ class OpenAIClient extends OpenAIWrapper {
                     tmpData = data;
                   }
                 } else {
+                  print("ELSE: " + line);
                   // If the response does not start with 'data： ', it is considered
                   // to be truncated, and at this time it needs to be concatenated
                   // together with 'tmpData'.
@@ -403,14 +403,14 @@ class OpenAIClient extends OpenAIWrapper {
               controller.close();
             },
             onError: (err, t) {
+              print("OnError: " + err.toString());
               log.error(err, t);
               if (err is DioException) {
                 controller
                   ..sink
                   ..addError(
                     handleError(
-                      code: err.response?.statusCode ??
-                          HttpStatus.internalServerError,
+                      code: err.response?.statusCode ?? HttpStatus.internalServerError,
                       message: '${err.message}',
                       data: err.response?.extra,
                     ),
@@ -428,8 +428,7 @@ class OpenAIClient extends OpenAIWrapper {
               ..sink
               ..addError(
                 handleError(
-                  code: error.response?.statusCode ??
-                      HttpStatus.internalServerError,
+                  code: error.response?.statusCode ?? HttpStatus.internalServerError,
                   message: '${error.message}',
                   data: error.response?.extra,
                 ),
