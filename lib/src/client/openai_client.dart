@@ -330,23 +330,24 @@ class OpenAIClient extends OpenAIWrapper {
           it.data.stream.listen(
             (it) {
               final rawData = utf8.decode(it);
+              print("rawData: " + rawData + "\n");
               final dataList = rawData.split("\n").where((element) => element.isNotEmpty).toList();
 
               for (final line in dataList) {
-                print("line: " + line);
+                print("line: " + line + "\n");
                 if (line.startsWith("data: ")) {
-                  print("data: " + line);
+                  print("data: " + line + "\n");
                   final data = line.substring(6);
-                  print("data2: " + line);
+                  print("data2: " + line + "\n");
                   if (data.startsWith("[DONE]")) {
-                    print("stream response is done");
+                    print("stream response is done" + "\n");
                     log.log("stream response is done");
 
                     return;
                   }
 
                   try {
-                    print("TRY: " + data);
+                    print("TRY: " + data + "\n");
                     controller
                       ..sink
                       ..add(complete(json.decode(data)));
@@ -357,7 +358,7 @@ class OpenAIClient extends OpenAIWrapper {
                     tmpData = data;
                   }
                 } else {
-                  print("ELSE: " + line);
+                  print("ELSE: " + line + "\n");
                   // If the response does not start with 'data： ', it is considered
                   // to be truncated, and at this time it needs to be concatenated
                   // together with 'tmpData'.
@@ -403,7 +404,7 @@ class OpenAIClient extends OpenAIWrapper {
               controller.close();
             },
             onError: (err, t) {
-              print("OnError: " + err.toString());
+              print("OnError: " + err.toString() + "\n");
               log.error(err, t);
               if (err is DioException) {
                 controller
