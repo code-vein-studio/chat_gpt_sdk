@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
+import 'dart:developer';
 import 'dart:io';
 
 import 'package:chat_gpt_sdk/src/client/exception/base_error_wrapper.dart';
@@ -332,7 +333,7 @@ class OpenAIClient extends OpenAIWrapper {
               final rawData = utf8.decode(it);
               print("rawData: " + rawData + "\n");
               final dataList = rawData.split("\n").where((element) => element.isNotEmpty).toList();
-
+              inspect(dataList);
               for (final line in dataList) {
                 print("line: " + line + "\n");
                 if (line.startsWith("data: ")) {
